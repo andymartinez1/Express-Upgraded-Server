@@ -1,7 +1,7 @@
 const express = require("express");
 
-const usersController = require("./controllers/users.controller");
-const messagesContoller = require("./controllers/messages.controller");
+const usersRouter = require("./routes/users.router");
+const messagesRouter = require("./routes/messages.router");
 
 const app = express();
 
@@ -13,19 +13,15 @@ app.use((req, res, next) => {
   next();
   const delta = Date.now() - start;
   // Log method and URL as well as response times
-  console.log(`${req.method} ${req.url} ${delta}ms`);
+  console.log(`${req.method} ${req.baseUrl}${req.url} ${delta}ms`);
 });
 
 // JSON parsing middleware
 app.use(express.json());
 
-// Add user POST middleware
-app.post("/users", usersController.postUsers);
-app.get("/users", usersController.getUsers);
-app.get("/users/:userId", usersController.getUser);
-
-app.get("/messages", messagesContoller.getMessages);
-app.post("/messages", messagesContoller.postMessage);
+// Mounted routers
+app.use("/users", usersRouter);
+app.use("/messages", messagesRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
