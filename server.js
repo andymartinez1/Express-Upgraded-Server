@@ -1,40 +1,31 @@
 const express = require("express");
 
+const usersController = require("./controllers/users.controller");
+const messagesContoller = require("./controllers/messages.controller");
+
 const app = express();
 
 const PORT = 3000;
 
-const users = [
-  {
-    id: 0,
-    name: "Test",
-  },
-  {
-    id: 1,
-    name: "Test",
-  },
-];
-
-app.get("/users", (req, res) => {
-  res.send(users);
+// Logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  next();
+  const delta = Date.now() - start;
+  // Log method and URL as well as response times
+  console.log(`${req.method} ${req.url} ${delta}ms`);
 });
 
-app.get("/users/:userId", (req, res) => {
-  const userId = Number(req.params.userId);
-  const user = users[userId];
-  if (user) {
-    res.json(user);
-  } else {
-  }
-});
+// JSON parsing middleware
+app.use(express.json());
 
-app.get("/messages", (req, res) => {
-  res.send("<ul><li>List Item</li></ul>");
-});
+// Add user POST middleware
+app.post("/users", usersController.postUsers);
+app.get("/users", usersController.getUsers);
+app.get("/users/:userId", usersController.getUser);
 
-app.post("/messages", (req, res) => {
-  console.log("Updating messages");
-});
+app.get("/messages", messagesContoller.getMessages);
+app.post("/messages", messagesContoller.postMessage);
 
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
